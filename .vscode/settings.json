@@ -1,0 +1,11 @@
+{
+    "java.project.sourcePaths": [
+        "src"
+    ],
+    "java.project.referencedLibraries": [
+        "dist\\lib\\mssql-jdbc-12.6.2.jre8.jar",
+        "dist\\lib\\mssql-jdbc-12.6.2.jre11.jar",
+        "dist\\lib\\mysql-connector-java-8.0.26.jar",
+        "dist\\lib\\rs2xml.jar"
+    ]
+}
