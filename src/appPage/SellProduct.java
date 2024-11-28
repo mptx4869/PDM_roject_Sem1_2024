@@ -5,6 +5,7 @@
 package appPage;
 
 import engine.ConnectSQL;
+import engine.Invoice;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -50,6 +51,7 @@ public class SellProduct extends javax.swing.JFrame {
         searchButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Slelect");
 
         jScrollPane1.setViewportView(jTextPane1);
 
@@ -84,6 +86,11 @@ public class SellProduct extends javax.swing.JFrame {
         });
 
         buyButton.setText("Buy");
+        buyButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buyButtonActionPerformed(evt);
+            }
+        });
 
         ResetButton.setText("Reset");
         ResetButton.addActionListener(new java.awt.event.ActionListener() {
@@ -198,6 +205,13 @@ public class SellProduct extends javax.swing.JFrame {
         updateContentSelectedList();
     }//GEN-LAST:event_deleteButtonActionPerformed
 
+    private void buyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buyButtonActionPerformed
+        // TODO add your handling code here:
+        BuildInvoice buildInvoice = new BuildInvoice(this, true);
+        buildInvoice.setInvoice(new Invoice(slectedMap));
+        buildInvoice .setVisible(true);
+    }//GEN-LAST:event_buyButtonActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -227,7 +241,9 @@ public class SellProduct extends javax.swing.JFrame {
         this.listProduct.setModel(listModel);
 
     }
-
+    public Map<Integer, Integer> getSlectedMap() {
+        return slectedMap;
+    }
     //////////////////
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */

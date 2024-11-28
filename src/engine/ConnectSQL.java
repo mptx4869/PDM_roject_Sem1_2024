@@ -10,7 +10,10 @@ package engine;
  */
 import net.proteanit.sql.DbUtils;
 import javax.swing.*;
+
+import java.math.BigDecimal;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,6 +25,15 @@ public class ConnectSQL {
     static  ResultSet rs = null ; 
     static  PreparedStatement stmt = null ;
     
+    public static void setUpConnection(){
+        if(con == null)
+            try {
+                con = DriverManager.getConnection(url,user,password);
+                System.out.println("Connect Database success");
+            } catch (SQLException e) {
+                System.out.println("Connect Database fail :"+ e.getMessage());
+            }
+    }
     public static void closeConnect(Connection con) {
         if (con != null) {
             try {
@@ -55,15 +67,12 @@ public class ConnectSQL {
         closeResultSet(rs);
     }
 
-    // Excute Query method
+// Excute Query method-----------------------------------------
     public static ResultSet excuteQuery(String query){
         
 
         try {
-            con = DriverManager.getConnection(url,user,password);
-            if(con.isValid(5) && con != null) System.out.println(" ket noi thanh cong");
-            System.out.println(con.toString());
-
+            setUpConnection();
             stmt = con.prepareStatement(query);
             rs = stmt.executeQuery();
         } catch (SQLException e) {
@@ -71,8 +80,23 @@ public class ConnectSQL {
                     null, "The database return error: "
                     + e.toString(), "Error", JOptionPane.WARNING_MESSAGE);
         }
+
         return rs;
     }
+
+    public static ResultSet excuteQuery(PreparedStatement pStatement){
+        try {
+            return pStatement.executeQuery();
+          
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(
+                    null, "The database return error: "
+                    + e.toString(), "Error", JOptionPane.WARNING_MESSAGE);
+        }
+
+        return null;
+    }
+
     public static Map<Integer, String> getProductIDName(){
         rs  = excuteQuery("Select Product_ID, Product_Name From Product");
         Map<Integer,String> map = new HashMap<>();
@@ -87,19 +111,49 @@ public class ConnectSQL {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        // for (Map.Entry<Integer, String> entry : map.entrySet()) 
-        // { System.out.println("ID: " + entry.getKey() + ", Name: " + entry.getValue()); }
         return map;
     }
-    // excute update method 
 
+    public static ResultSet selectInvoice(int customer_ID, Date date, BigDecimal Total_Amount){
+        String query ;
+        query = "SELECT * FROM Invoice WHERE Customer_ID = ? AND Date = ? AND Total_Amount = ?";
+        try {
+            setUpConnection();
+            stmt = con.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            stmt.setInt(1, customer_ID);
+            stmt.setDate(2, date);
+            stmt.setBigDecimal(3, Total_Amount);
+            return stmt.executeQuery();
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+        return null;
+        
+    }
+
+    public static ResultSet getAllPrice(){
+        return excuteQuery("Select * From Price_List ");
+    }
+
+    
+// excute update method ---------------------------------------------
+    public static void update(PreparedStatement pStatement){
+        try {
+            pStatement.executeUpdate();
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
     public static boolean insert(String query){
         try {
-            con = DriverManager.getConnection(url,user,password);
+            setUpConnection();
             System.out.println(con.toString());
-            
             stmt = con.prepareStatement(query);
-            rs = stmt.executeQuery();
+            int isSuccess = stmt.executeUpdate();
+            if(isSuccess >0 ) return true;
+            else
+                return false;
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(
                     null, "The database return error: "
@@ -108,33 +162,69 @@ public class ConnectSQL {
         return false;
     }
 
-    public static boolean excuteUpdate(String query ){
-        Connection con = null;
-        ResultSet rs = null ; 
-        PreparedStatement stmt = null ;
-
+    public static ResultSet insertInvoice(int customer_ID, long totalAmount){
+        int isSuccess =0;
+        Date date = Date.valueOf(LocalDate.now());
+        BigDecimal ttamount = new BigDecimal(totalAmount);
         try {
-            con = DriverManager.getConnection(url,user,password);
-            stmt = con.prepareStatement(query);
-           // int isSuccess = stmt.excuteUpdate();
-            
-
+            setUpConnection();
+            stmt = con.prepareStatement("INSERT INTO Invoice (Customer_ID, Date, Total_Amount) VALUES(?,?,?)");
+            stmt.setInt(1, customer_ID);
+            stmt.setDate(2, Date.valueOf(LocalDate.now()));
+            stmt.setBigDecimal(3, ttamount);
+            System.out.println();
+            isSuccess = stmt.executeUpdate();
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(
                     null, "The database return error: "
                     + e.toString(), "Error", JOptionPane.WARNING_MESSAGE);
-        } finally {
-            closeConnect(con);
-            closeStatement(stmt);
         }
+        if(isSuccess > 0 )
+            return selectInvoice(customer_ID, date, ttamount);
+        else    
+            return null;
 
-        return true;
     }
+
+    public static boolean insertPrice(int productID, BigDecimal price, Date dateEffective){
+        int isSuccess =0;
+        try {
+            setUpConnection();
+            stmt = con.prepareStatement("INSERT INTO Price_List (Product_ID, Price, Date_Effective)VALUES(?,?,?)");
+            stmt.setInt(1, productID);
+            stmt.setDate(3,dateEffective );
+            stmt.setBigDecimal(2, price);
+            System.out.println();
+            isSuccess = stmt.executeUpdate();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(
+                    null, "The database return error: "
+                    + e.toString(), "Error", JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+        if(isSuccess > 0 ){
+        JOptionPane.showMessageDialog(
+            null, "success full");
+            return true;
+        }
+        return false;
+    }
+
 
 // test the connection 
     public static void main(String[] args) {
-        ResultSet rs= excuteQuery("Select * From customer");
-       getProductIDName();
+        ResultSet rs;
+        //rs = insertInvoice(1, 1100);
+        rs = selectInvoice(1, Date.valueOf(LocalDate.now()), new BigDecimal(100));
+        try {
+            //System.out.println(rs.getInt("Invoice_ID") +" 111111111111111");
+            if (rs.last()) {
+                System.out.println(rs.getInt("Invoice_ID") +" 111111111111111");
+            }
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
     
 }
