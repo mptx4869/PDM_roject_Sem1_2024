@@ -35,4 +35,7 @@ public class ProductList {
         updateProductList();
         showMap();
     }
+    public static Product getProductById(int id){
+        return producMap.get(id);
+    }
 }

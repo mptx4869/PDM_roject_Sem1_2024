@@ -74,6 +74,7 @@ public class ConnectSQL {
         try {
             setUpConnection();
             stmt = con.prepareStatement(query);
+            System.out.println(query);
             rs = stmt.executeQuery();
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(
@@ -130,30 +131,106 @@ public class ConnectSQL {
         return null;
         
     }
-
-    public static ResultSet getAllPrice(){
-        return excuteQuery("Select * From Price_List ");
-    }
-
-    
-// excute update method ---------------------------------------------
-    public static void update(PreparedStatement pStatement){
+    public static Product getProductByID (int ID ){
+        rs = excuteQuery("Select * From product WHERE Product_ID = "+ID );
+        Product product = null;
         try {
-            pStatement.executeUpdate();
+            if(rs.next() ){
+                product = new Product(rs.getInt("Product_ID"), 
+                rs.getString("Product_Name"), 
+                rs.getString("Category"), 
+                rs.getString("BarCode"),
+                rs.getBigDecimal("Price"));
+            }
+            return product;
         } catch (SQLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+            return null;
         }
     }
-    public static boolean insert(String query){
+    public static ResultSet getAllPrice(){
+        return excuteQuery("Select * From Price_List ");
+    }
+    
+// excute update method ---------------------------------------------
+    public static boolean update(PreparedStatement pStatement){
+        try {
+            
+            if ( pStatement.executeUpdate() >0 ){
+                
+                return true;
+            }else{
+                
+                return false;
+            }
+
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return false;
+        }
+    }
+    public static boolean updateProduct( Product product){
+        String query = "Update Product Set Product_Name=?,Category=?,BarCode=?,Price=?  where  Product_ID = ?";
         try {
             setUpConnection();
             System.out.println(con.toString());
             stmt = con.prepareStatement(query);
-            int isSuccess = stmt.executeUpdate();
-            if(isSuccess >0 ) return true;
-            else
+            
+            stmt.setString(1, product.getProduct_name());
+            stmt.setString(2, product.getCategory());
+            stmt.setString(3, product.getBarCode());
+            stmt.setBigDecimal(4, product.getPrice());
+            return update(stmt);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(
+                    null, "The database return error: "
+                    + e.toString(), "Error", JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+    }
+    public static int isExitProdct(Product product){
+        rs = excuteQuery("Select Product_ID From product Where Product_Name = '"+ product.getProduct_name() + 
+                    "' AND Category= '"+product.getCategory()+
+                    "' AND BarCode='"+product.getBarCode()+
+                    "' AND Price="+product.getPrice());
+
+        int i =0;
+        try {
+            while (rs.next()) {
+                i=rs.getInt("Product_ID");                    
+            }
+            System.out.println(i);
+            return i;
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return i;
+    }
+    public static boolean insertProduct(Product product){
+        try {
+            String query = "INSERT INTO Product (Product_Name, Category, BarCode, Price) VALUES (?,?,?,?)";
+            int i=isExitProdct(product);
+            if(i > 1){
+                JOptionPane.showMessageDialog(null, "the Product has been exit");
+                //System.out.println("1111111111111111111");
                 return false;
+            }
+
+            setUpConnection();
+            stmt = con.prepareStatement(query);
+        
+            stmt.setString(1, product.getProduct_name());
+            stmt.setString(2, product.getCategory());
+            stmt.setString(3, product.getBarCode());
+            stmt.setBigDecimal(4, product.getPrice());
+            if (update(stmt)){
+                i = isExitProdct(product);
+                insertPrice(i, product.getPrice(), Date.valueOf(LocalDate.now()));
+            }else
+            return false;
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(
                     null, "The database return error: "
@@ -185,7 +262,7 @@ public class ConnectSQL {
             return null;
 
     }
-
+    
     public static boolean insertPrice(int productID, BigDecimal price, Date dateEffective){
         int isSuccess =0;
         try {
@@ -213,18 +290,7 @@ public class ConnectSQL {
 
 // test the connection 
     public static void main(String[] args) {
-        ResultSet rs;
-        //rs = insertInvoice(1, 1100);
-        rs = selectInvoice(1, Date.valueOf(LocalDate.now()), new BigDecimal(100));
-        try {
-            //System.out.println(rs.getInt("Invoice_ID") +" 111111111111111");
-            if (rs.last()) {
-                System.out.println(rs.getInt("Invoice_ID") +" 111111111111111");
-            }
-        } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        new Product(-1, "NhanHoaaa", "trai Dep", "111222333444", new BigDecimal(1000)).insertProduct();
     }
     
 }

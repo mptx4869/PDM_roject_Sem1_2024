@@ -1,6 +1,5 @@
 package pdm_project_s12024;
 
-import appPage.Addproduct;
 import javax.swing.JFrame;
 import engine.*;
 

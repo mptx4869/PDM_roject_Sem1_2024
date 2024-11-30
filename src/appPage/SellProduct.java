@@ -6,6 +6,8 @@ package appPage;
 
 import engine.ConnectSQL;
 import engine.Invoice;
+import engine.Product;
+import engine.ProductList;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -232,6 +234,7 @@ public class SellProduct extends javax.swing.JFrame {
     public void setConetentProductList() {
         
         listProductID.clear();
+        ProductList.updateProductList();
         
         DefaultListModel<String> listModel = new DefaultListModel<>();
         for (Map.Entry<Integer, String> entry : mapProduct.entrySet()) {

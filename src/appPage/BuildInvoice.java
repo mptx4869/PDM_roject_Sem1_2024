@@ -120,6 +120,7 @@ public class BuildInvoice extends javax.swing.JDialog {
 
     private void SellButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SellButtonActionPerformed
         // TODO add your handling code here:
+        this.invoice.showInvoice();
     }//GEN-LAST:event_SellButtonActionPerformed
 
     /**

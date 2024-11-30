@@ -1,6 +1,5 @@
 package pdm_project_s12024;
 
-import appPage.Addproduct;
 import appPage.SellProduct;
 
 import javax.swing.JLabel;

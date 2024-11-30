@@ -2,7 +2,7 @@ package engine;
 
 import java.math.BigDecimal;
 import java.util.Map;
-import java.util.stream.Gatherer.Integrator;
+//import java.util.stream.Gatherer.Integrator;
 
 public class Invoice {
     private Map<Integer,Integer> selectedMap;
@@ -12,7 +12,6 @@ public class Invoice {
         this.selectedMap = selectedMap;
         setTotal_Amount();
     }
-
     public BigDecimal getTotal_Amount() {
         return total_Amount;
     }
@@ -25,7 +24,12 @@ public class Invoice {
             amount += entry;
         }
     }
-    
+    public void showInvoice(){
+        if(this.selectedMap != null)
+        for(Map.Entry<Integer,Integer> entry : selectedMap.entrySet()){
+            System.out.println(ProductList.producMap.get(entry.getKey()).toString()+" amount = "+entry.getValue());
+        }
+    }
     public void setSelectedMap(Map<Integer, Integer> selectedMap) {
         this.selectedMap = selectedMap;
     }
