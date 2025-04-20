@@ -1,0 +1,562 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ */
+package pdmProject;
+
+//import com.itextpdf.text.Paragraph;
+//
+//import com.itextpdf.text.pdf.PdfWriter;
+//import java.io.FileOutputStream;
+import static java.lang.System.exit;
+import java.sql.*;
+import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Date;
+
+import javax.swing.DefaultListModel;
+import javax.swing.JOptionPane;
+import javax.swing.JRadioButton;
+
+import javax.swing.ListSelectionModel;
+import javax.swing.table.DefaultTableModel;
+
+/**
+ *
+ * @author ZBook
+ */
+public class Billing extends javax.swing.JFrame {
+
+    DefaultListModel defaultlistmodel = new DefaultListModel();
+    public double finalTotal = 0;
+    String text = "";
+    public static ArrayList<Integer> productIDs = new ArrayList<>();
+    public static ArrayList<Integer> quantities = new ArrayList<>();
+
+    /**
+     * Creates new form Billing
+     */
+    public Billing() {
+        initComponents();
+        SimpleDateFormat dFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = new Date();
+        jLabel4.setText(dFormat.format(date));
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now();
+        jLabel5.setText(dtf.format(now));
+        this.bindData();
+        this.addtoTable();
+jScrollPane2.setVisible(false);
+//       String [] customers=new String[8];
+//       customers [0]="a";
+//       customers [1]="b";
+//       customers [2]="c";
+//       customers [3]="d";
+//       customers [4]="e";
+//       customers [5]="f";
+//       
+//
+//       DefaultListModel dlm= new DefaultListModel();
+//       for(int i=0;i<customers.length;i++){
+//           dlm.addElement(customers[i]);
+//       }
+//       
+//       ListCustomers.setModel(dlm);
+//       ListCustomers.setVisibleRowCount(3);
+    }
+
+    private void addtoTable() {
+      
+        String Pname = "";
+        String category = "";
+        Double price = 0.0;
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        try {
+            Connection con = SQLConnector.getCon();
+            Statement st = con.createStatement();
+            for (int i = 0; i < productIDs.size(); i++) {
+                ResultSet rs = st.executeQuery("select product_name,category,price from product where product_id= '" + Integer.valueOf(productIDs.get(i)) + "';");
+                if (rs.next()) {
+                    Pname = rs.getString(1);
+                    category = rs.getString(2);
+                    price = Double.valueOf(rs.getString(3));
+
+                }
+                model.addRow(new Object[]{Pname, category, quantities.get(i), price * quantities.get(i)});
+                finalTotal = finalTotal + price * quantities.get(i);
+            }
+            String finalTotaltext = String.valueOf(finalTotal);
+            jTextField4.setText(finalTotaltext);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
+
+    }
+
+    private ArrayList getCustomer() {
+        ArrayList customer = new ArrayList();
+        try {
+            Connection con = SQLConnector.getCon();
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery("select customer_name from customer c join customer_phone cp "
+                    + "on c.customer_id=cp.customer_id;");
+            while (rs.next()) {
+                customer.add(rs.getString("customer_name"));
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
+
+        return customer;
+    }
+
+    private void bindData() {
+        getCustomer().stream().forEach((customer) -> {
+            defaultlistmodel.addElement(customer);
+        });
+        ListCustomers.setModel(defaultlistmodel);
+        ListCustomers.setVisibleRowCount(3);
+        ListCustomers.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+    }
+
+    private void searchFilter(String searchTerm) {
+        DefaultListModel filterItems = new DefaultListModel();
+        ArrayList customers = getCustomer();
+        customers.stream().forEach((customer) -> {
+            String CustomerName = customer.toString().toLowerCase();
+            if (CustomerName.contains(searchTerm.toLowerCase())) {
+                filterItems.addElement(customer);
+            }
+        });
+        defaultlistmodel = filterItems;
+
+        ListCustomers.setModel(defaultlistmodel);
+        ListCustomers.setVisibleRowCount(3);
+
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        buttonGroup1 = new javax.swing.ButtonGroup();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        jSeparator1 = new javax.swing.JSeparator();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        jTextField1 = new javax.swing.JTextField();
+        jLabel8 = new javax.swing.JLabel();
+        jTextField2 = new javax.swing.JTextField();
+        jLabel9 = new javax.swing.JLabel();
+        jTextField3 = new javax.swing.JTextField();
+        jSeparator2 = new javax.swing.JSeparator();
+        jLabel10 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
+        jTextField4 = new javax.swing.JTextField();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        ListCustomers = new javax.swing.JList<>();
+        jButton2 = new javax.swing.JButton();
+        Credit = new javax.swing.JRadioButton();
+        PayPal = new javax.swing.JRadioButton();
+        Cash = new javax.swing.JRadioButton();
+        Debit = new javax.swing.JRadioButton();
+        jLabel14 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setLocation(new java.awt.Point(380, 160));
+
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(51, 0, 102));
+        jLabel1.setText("BILLING INVOICE");
+
+        jLabel2.setForeground(new java.awt.Color(51, 0, 102));
+        jLabel2.setText("Date:");
+
+        jLabel3.setForeground(new java.awt.Color(51, 0, 102));
+        jLabel3.setText("Time:");
+
+        jLabel4.setText("jLabel4");
+
+        jLabel5.setText("jLabel5");
+
+        jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(51, 0, 102));
+        jLabel6.setText("Customer Detail :");
+
+        jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel7.setForeground(new java.awt.Color(51, 0, 102));
+        jLabel7.setText("Name");
+
+        jTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                jTextField1KeyReleased(evt);
+            }
+        });
+
+        jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel8.setForeground(new java.awt.Color(51, 0, 102));
+        jLabel8.setText("Tel");
+
+        jLabel9.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel9.setForeground(new java.awt.Color(51, 0, 102));
+        jLabel9.setText("Email");
+
+        jLabel10.setForeground(new java.awt.Color(51, 0, 102));
+        jLabel10.setText("Calculation Detail: ");
+
+        jLabel11.setForeground(new java.awt.Color(51, 0, 102));
+        jLabel11.setText("Total");
+
+        jScrollPane2.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+
+        ListCustomers.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        ListCustomers.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                ListCustomersMouseClicked(evt);
+            }
+        });
+        jScrollPane2.setViewportView(ListCustomers);
+
+        jButton2.setBackground(new java.awt.Color(204, 204, 255));
+        jButton2.setFont(new java.awt.Font("Helvetica Neue", 1, 13)); // NOI18N
+        jButton2.setText("Save");
+        jButton2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        buttonGroup1.add(Credit);
+        Credit.setText("Credit Card");
+
+        buttonGroup1.add(PayPal);
+        PayPal.setText("PayPal");
+
+        buttonGroup1.add(Cash);
+        Cash.setText("Cash");
+
+        buttonGroup1.add(Debit);
+        Debit.setText("Debit Card");
+
+        jLabel14.setForeground(new java.awt.Color(51, 0, 102));
+        jLabel14.setText("Payment method");
+
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Name", "Category", "Quantity", "Price"
+            }
+        ));
+        jScrollPane1.setViewportView(jTable1);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(617, 617, 617)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel3))
+                        .addGap(17, 17, 17)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel4)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(1, 1, 1)
+                                .addComponent(jLabel5))))
+                    .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 989, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel6)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 194, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(72, 72, 72)
+                        .addComponent(jLabel8)
+                        .addGap(18, 18, 18)
+                        .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 194, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(91, 91, 91)
+                        .addComponent(jLabel9)
+                        .addGap(18, 18, 18)
+                        .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 194, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(62, 62, 62)
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 194, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 584, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(48, 48, 48)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel10)
+                                    .addComponent(jLabel14)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGap(6, 6, 6)
+                                        .addComponent(Credit))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGap(6, 6, 6)
+                                        .addComponent(PayPal)))
+                                .addGap(83, 83, 83)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(Cash)
+                                    .addComponent(Debit)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(2, 2, 2)
+                                .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(724, 724, 724)
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 989, javax.swing.GroupLayout.PREFERRED_SIZE)))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(12, 12, 12)
+                        .addComponent(jLabel1))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addGap(12, 12, 12)
+                        .addComponent(jLabel3))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel4)
+                        .addGap(12, 12, 12)
+                        .addComponent(jLabel5)))
+                .addGap(18, 18, 18)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(6, 6, 6)
+                .addComponent(jLabel6)
+                .addGap(12, 12, 12)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(3, 3, 3)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel7)
+                            .addComponent(jLabel8)
+                            .addComponent(jLabel9))))
+                .addGap(6, 6, 6)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(36, 36, 36)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 224, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(36, 36, 36)
+                        .addComponent(jLabel10)
+                        .addGap(2, 2, 2)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel11)
+                            .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(12, 12, 12)
+                        .addComponent(jLabel14)
+                        .addGap(12, 12, 12)
+                        .addComponent(Credit)
+                        .addGap(26, 26, 26)
+                        .addComponent(PayPal))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(134, 134, 134)
+                        .addComponent(Cash)
+                        .addGap(26, 26, 26)
+                        .addComponent(Debit))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(226, 226, 226)
+                        .addComponent(jButton2))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(20, 20, 20)
+                        .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE))))
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void jTextField1KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyReleased
+        text = jTextField1.getText();
+        if (text.isBlank()) {
+            jScrollPane2.setVisible(false);
+
+        } else {
+            jScrollPane2.setVisible(true);
+            this.revalidate();
+            this.repaint();
+            searchFilter(jTextField1.getText());
+        }
+
+    }//GEN-LAST:event_jTextField1KeyReleased
+
+    private void ListCustomersMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ListCustomersMouseClicked
+        // JOptionPane.showMessageDialog(rootPane, ListCustomers.getSelectedValue(), "Select Customer", JOptionPane.INFORMATION_MESSAGE);
+        String name = ListCustomers.getSelectedValue();
+        try {
+            Connection con = SQLConnector.getCon();
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery("select customer_name,phonenumber,email from customer c join customer_phone cp "
+                    + "on c.customer_id=cp.customer_id where customer_name='" + name + "';");
+            if (rs.next()) {
+                jTextField1.setText(rs.getString(1));
+                jTextField2.setText(rs.getString(2));
+                jTextField3.setText(rs.getString(3));
+            }
+            jScrollPane2.setVisible(false);
+
+        } catch (Exception e) {
+        }
+    }//GEN-LAST:event_ListCustomersMouseClicked
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        String name = jTextField1.getText();
+        ArrayList<JRadioButton>groupButton=new ArrayList<JRadioButton>();
+        groupButton.add(Credit);
+        groupButton.add(Debit);
+        groupButton.add(Cash);
+        groupButton.add(PayPal);
+        
+        int invoice_id=0;
+       String getSelectedButton="";
+       int payment_id=0;
+        String TotalAmount = jTextField4.getText();
+        SimpleDateFormat dFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date mydate = new Date();
+       java.sql.Date Date = new java.sql.Date(mydate.getTime());
+      for(JRadioButton selectButton:groupButton){
+          if(selectButton.isSelected()){
+              getSelectedButton=selectButton.getText();
+              System.out.println(getSelectedButton);
+          }
+      }
+        try {
+            Connection con = SQLConnector.getCon();
+            Statement st = con.createStatement();
+ResultSet rs=st.executeQuery("select p.Payment_id from payment p where p.payment_method='"+getSelectedButton+"';");
+if(rs.next()){
+    payment_id=rs.getInt(1);
+}
+if(payment_id==0){
+    JOptionPane.showMessageDialog(null, "Please select a payment method");
+    return;
+}
+            st.executeUpdate("INSERT INTO invoice(Customer_ID, Date, Total_Amount,Payment_ID) "
+                    + "VALUES((select c.Customer_ID from Customer c where c.Customer_Name='" + name + "'),'" + Date + "', '" 
+                    + TotalAmount + "',"+payment_id+");");
+            
+             rs=st.executeQuery("select max(i.invoice_id) from invoice i;");
+            if(rs.next()){
+               invoice_id=rs.getInt(1);
+            }
+            else{
+                System.out.println("Can't get invoice_id");
+            }
+       for(int i=0;i<productIDs.size();i++){
+           st.executeUpdate("insert into contain(product_id,invoice_id,amount)"
+                   + "values("+productIDs.get(i)+","+invoice_id+","+quantities.get(i)+");");
+       }     
+
+            JOptionPane.showMessageDialog(null, "The invoice has been saved");
+             this.dispose();
+//            setVisible(false);
+//            new Billing().setVisible(true);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
+     
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(Billing.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(Billing.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(Billing.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(Billing.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new Billing().setVisible(true);
+            }
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JRadioButton Cash;
+    private javax.swing.JRadioButton Credit;
+    private javax.swing.JRadioButton Debit;
+    private javax.swing.JList<String> ListCustomers;
+    private javax.swing.JRadioButton PayPal;
+    private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JTable jTable1;
+    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField jTextField2;
+    private javax.swing.JTextField jTextField3;
+    private javax.swing.JTextField jTextField4;
+    // End of variables declaration//GEN-END:variables
+}
